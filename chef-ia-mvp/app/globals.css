@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-cream text-cacau dark:bg-cacau dark:text-cream transition-colors duration-300;
+}
+
+/* Elemento assinatura: um traço de bico de confeitar (piping swirl),
+   usado como divisor discreto entre seções — nunca decorativo em excesso. */
+.piping-divider {
+  display: block;
+  width: 72px;
+  height: 14px;
+  margin: 0 auto;
+}
+
+.focus-ring {
+  @apply outline-none ring-2 ring-offset-2 ring-framboesa ring-offset-cream dark:ring-offset-cacau;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
