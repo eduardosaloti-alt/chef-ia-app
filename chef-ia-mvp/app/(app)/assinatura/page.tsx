@@ -6,31 +6,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+const LINKS_CHECKOUT: Record<"fundador" | "pro", string> = {
+  fundador: "https://pay.kiwify.com.br/8Z0XPUs",
+  pro: "https://pay.kiwify.com.br/SXfi1iN",
+};
+
 export default function AssinaturaPage() {
   const { profile } = useChefIA();
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function abrirCheckout(plano: "fundador" | "pro") {
-    setErro(null);
-    setCarregando(true);
-    try {
-      const resposta = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ plano }),
-      });
-      const dados = await resposta.json();
-      if (dados.url) {
-        window.location.href = dados.url;
-      } else {
-        setErro(dados.erro ?? "Não foi possível iniciar o checkout.");
-      }
-    } catch {
-      setErro("Não foi possível conectar ao Stripe agora.");
-    } finally {
-      setCarregando(false);
-    }
+  function abrirCheckout(plano: "fundador" | "pro") {
+    window.open(LINKS_CHECKOUT[plano], "_blank");
   }
 
   async function abrirPortal() {
@@ -86,10 +73,10 @@ export default function AssinaturaPage() {
               Você está no plano gratuito. Assine o Pro para desbloquear pedidos e clientes ilimitados.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button onClick={() => abrirCheckout("fundador")} disabled={carregando}>
+              <Button onClick={() => abrirCheckout("fundador")}>
                 Quero ser fundadora — R$19,90/mês
               </Button>
-              <Button variant="secondary" onClick={() => abrirCheckout("pro")} disabled={carregando}>
+              <Button variant="secondary" onClick={() => abrirCheckout("pro")}>
                 Assinar Pro — R$39,90/mês
               </Button>
             </div>
