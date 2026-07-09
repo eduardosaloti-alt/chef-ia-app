@@ -98,6 +98,25 @@ export async function updatePedidoStatus(id: string, status: Pedido["status"]) {
   if (error) throw error;
 }
 
+export async function listProdutos(): Promise<Produto[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("produtos")
+    .select("*")
+    .order("criado_em", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((p) => ({
+    id: p.id,
+    nome: p.nome,
+    categoria: p.categoria,
+    custoIngredientes: p.custo_ingredientes,
+    custoMaoDeObra: p.custo_mao_de_obra,
+    custoFixoRateado: p.custo_fixo_rateado,
+    margemDesejada: p.margem_desejada,
+    precoSugerido: p.preco_sugerido,
+  }));
+}
+
 export async function listTransacoes(): Promise<Transacao[]> {
   const supabase = createClient();
   const { data, error } = await supabase
