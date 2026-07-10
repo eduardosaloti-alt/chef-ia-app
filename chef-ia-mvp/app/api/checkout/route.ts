@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     mode: "subscription",
     customer_email: user.email ?? undefined,
     line_items: [{ price: priceId, quantity: 1 }],
+        subscription_data: { trial_period_days: 15 },
     success_url: `${request.headers.get("origin")}/dashboard?assinatura=sucesso`,
     cancel_url: `${request.headers.get("origin")}/assinatura`,
     metadata: { user_id: user.id, plano: planoFinal },
