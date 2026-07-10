@@ -35,20 +35,22 @@ export async function POST(request: Request) {
 
   const { data: vagas } = await supabase.rpc("contar_fundadores");
     const aindaHaVagas = (vagas ?? 0) < 100;
-
+const userEmail = user.email;
+    const userId = user.id;
+    
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     const origin = request.headers.get("origin");
 
   function montarSessao(comCupom: boolean) {
         return stripe.checkout.sessions.create({
                 mode: "subscription",
-                customer_email: user.email ?? undefined,
+                                customer_email: userEmail ?? undefined,
                 line_items: [{ price: priceId!, quantity: 1 }],
                 subscription_data: { trial_period_days: 15 },
                 ...(comCupom && couponId ? { discounts: [{ coupon: couponId }] } : {}),
                 success_url: `${origin}/dashboard?assinatura=sucesso`,
                 cancel_url: `${origin}/assinatura`,
-                metadata: { user_id: user.id, plano: comCupom && couponId ? "fundador" : "pro" },
+                        metadata: { user_id: userId, plano: comCupom && couponId ? "fundador" : "pro" },
         });
   }
 
