@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           .update({
             plano,
             fundador: plano === "fundador",
-            preco_travado: plano === "fundador" ? 19.9 : 39.9,
+            preco_travado: plano === "fundador" ? 19.9 : 29.9,
           })
           .eq("id", userId);
       }
