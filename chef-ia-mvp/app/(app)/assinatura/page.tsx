@@ -6,20 +6,28 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const LINKS_CHECKOUT: Record<"fundador" | "pro", string> = {
-  fundador: "https://pay.kiwify.com.br/8Z0XPUs",
-  pro: "https://pay.kiwify.com.br/SXfi1iN",
-};
-
 export default function AssinaturaPage() {
   const { profile } = useChefIA();
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  function abrirCheckout(plano: "fundador" | "pro") {
-    window.open(LINKS_CHECKOUT[plano], "_blank");
-  }
-
+async function abrirCheckout() {
+      setErro(null);
+      setCarregando(true);
+      try {
+              const resposta = await fetch("/api/checkout", { method: "POST" });
+              const dados = await resposta.json();
+              if (dados.url) {
+                        window.location.href = dados.url;
+              } else {
+                        setErro(dados.erro ?? "Nao foi possivel iniciar o checkout.");
+              }
+      } catch {
+              setErro("Nao foi possivel conectar ao Stripe agora.");
+      } finally {
+              setCarregando(false);
+      }
+}
   async function abrirPortal() {
     setErro(null);
     setCarregando(true);
@@ -70,14 +78,11 @@ export default function AssinaturaPage() {
         ) : (
           <>
             <p className="text-sm text-cacau/60 dark:text-cream/60">
-              Você está no plano gratuito. Assine o Pro para desbloquear pedidos e clientes ilimitados.
+                            Voce esta no plano gratuito. Assine a Chef IA para desbloquear pedidos e clientes ilimitados. Primeiros 15 dias gratis.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button onClick={() => abrirCheckout("fundador")}>
-                Quero ser fundadora — R$19,90/mês
-              </Button>
-              <Button variant="secondary" onClick={() => abrirCheckout("pro")}>
-                Assinar Pro — R$39,90/mês
+              <Button onClick={abrirCheckout} disabled={carregando}>
+                              Assinar agora - R$29,90/mes
               </Button>
             </div>
           </>
@@ -89,7 +94,7 @@ export default function AssinaturaPage() {
         <h2 className="mb-3 font-display text-lg">Como funciona o preço de fundadora</h2>
         <p className="text-sm text-cacau/60 dark:text-cream/60">
           As primeiras 100 confeiteiras pagam R$19,90/mês para sempre. Depois de preenchidas as
-          100 vagas, o checkout aplica automaticamente o plano Pro por R$39,90/mês.
+                        100 vagas, o valor passa a ser R$29,90/mes.
         </p>
       </Card>
     </div>
