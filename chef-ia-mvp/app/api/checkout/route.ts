@@ -4,56 +4,64 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * POST /api/checkout
- * Body: { plano: "fundador" | "pro" }
- * Cria uma sessão de checkout do Stripe para o plano escolhido e retorna a URL de redirecionamento.
+ * Cria uma sessão de checkout do Stripe para a assinatura da Chef IA (preço único
+ * de R$29,90/mês, com 15 dias de trial grátis) e retorna a URL de redirecionamento.
  *
- * Regra do plano Fundador: antes de criar a sessão com STRIPE_PRICE_ID_FUNDADOR,
- * verifique no banco (contar_fundadores()) se ainda restam vagas das 100 —
- * caso contrário, force o plano "pro" mesmo que o front peça "fundador".
+ * Promoção "Fundadora": enquanto restarem vagas das 100 primeiras
+ * (contar_fundadores() < 100), aplicamos automaticamente o cupom
+ * STRIPE_COUPON_ID_FUNDADOR (R$10 de desconto vitalício -> R$19,90/mês para sempre).
+ * Se o cupom não puder ser aplicado (ex: esgotou nesse instante), seguimos sem
+ * desconto em vez de falhar o checkout.
  */
 export async function POST(request: Request) {
-  const { plano } = (await request.json()) as { plano: "fundador" | "pro" };
-
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const supabase = createClient();
+    const {
+          data: { user },
+    } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ erro: "Você precisa estar logada para assinar." }, { status: 401 });
+        return NextResponse.json({ erro: "Você precisa estar logada para assinar." }, { status: 401 });
   }
 
-  let planoFinal = plano;
-  if (plano === "fundador") {
-    const { data: vagas } = await supabase.rpc("contar_fundadores");
-    if ((vagas ?? 0) >= 100) {
-      planoFinal = "pro";
-    }
-  }
-
-  const priceId =
-    planoFinal === "fundador"
-      ? process.env.STRIPE_PRICE_ID_FUNDADOR
-      : process.env.STRIPE_PRICE_ID_PRO;
+  const priceId = process.env.STRIPE_PRICE_ID_PRO;
+    const couponId = process.env.STRIPE_COUPON_ID_FUNDADOR;
 
   if (!priceId) {
-    return NextResponse.json(
-      { erro: "Stripe ainda não está configurado (faltam as variáveis de ambiente)." },
-      { status: 500 }
-    );
+        return NextResponse.json(
+          { erro: "Stripe ainda não está configurado (faltam as variáveis de ambiente)." },
+          { status: 500 }
+              );
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const { data: vagas } = await supabase.rpc("contar_fundadores");
+    const aindaHaVagas = (vagas ?? 0) < 100;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer_email: user.email ?? undefined,
-    line_items: [{ price: priceId, quantity: 1 }],
-        subscription_data: { trial_period_days: 15 },
-    success_url: `${request.headers.get("origin")}/dashboard?assinatura=sucesso`,
-    cancel_url: `${request.headers.get("origin")}/assinatura`,
-    metadata: { user_id: user.id, plano: planoFinal },
-  });
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    const origin = request.headers.get("origin");
+
+  function montarSessao(comCupom: boolean) {
+        return stripe.checkout.sessions.create({
+                mode: "subscription",
+                customer_email: user.email ?? undefined,
+                line_items: [{ price: priceId!, quantity: 1 }],
+                subscription_data: { trial_period_days: 15 },
+                ...(comCupom && couponId ? { discounts: [{ coupon: couponId }] } : {}),
+                success_url: `${origin}/dashboard?assinatura=sucesso`,
+                cancel_url: `${origin}/assinatura`,
+                metadata: { user_id: user.id, plano: comCupom && couponId ? "fundador" : "pro" },
+        });
+  }
+
+  let session;
+    try {
+          session = await montarSessao(aindaHaVagas);
+    } catch (erroCupom) {
+          if (aindaHaVagas) {
+                  session = await montarSessao(false);
+          } else {
+                  throw erroCupom;
+          }
+    }
 
   return NextResponse.json({ url: session.url });
 }
