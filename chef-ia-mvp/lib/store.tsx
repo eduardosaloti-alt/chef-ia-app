@@ -10,6 +10,9 @@ import {
   addPedido as addPedidoQuery,
   updatePedidoStatus as updatePedidoStatusQuery,
   listProdutos,
+  addProduto as addProdutoQuery,
+  updateProduto as updateProdutoQuery,
+  deleteProduto as deleteProdutoQuery,
   listTransacoes,
   addTransacao as addTransacaoQuery,
 } from "@/lib/supabase/queries";
@@ -30,6 +33,9 @@ interface ChefIAState {
   addCliente: (c: Omit<Cliente, "id">) => Promise<void>;
   addPedido: (p: Omit<Pedido, "id">) => Promise<void>;
   updatePedidoStatus: (id: string, status: Pedido["status"]) => Promise<void>;
+  addProduto: (p: Omit<Produto, "id">) => Promise<void>;
+  updateProduto: (id: string, p: Omit<Produto, "id">) => Promise<void>;
+  deleteProduto: (id: string) => Promise<void>;
   addTransacao: (t: Omit<Transacao, "id">) => Promise<void>;
 }
 
@@ -96,6 +102,23 @@ export function ChefIAProvider({ children }: { children: React.ReactNode }) {
     await updatePedidoStatusQuery(id, status);
   };
 
+  const addProduto = async (p: Omit<Produto, "id">) => {
+    await addProdutoQuery(p);
+    const atualizados = await listProdutos();
+    setProdutos(atualizados);
+  };
+
+  const updateProduto = async (id: string, p: Omit<Produto, "id">) => {
+    await updateProdutoQuery(id, p);
+    const atualizados = await listProdutos();
+    setProdutos(atualizados);
+  };
+
+  const deleteProduto = async (id: string) => {
+    await deleteProdutoQuery(id);
+    setProdutos((prev) => prev.filter((p) => p.id !== id));
+  };
+
   const addTransacao = async (t: Omit<Transacao, "id">) => {
     await addTransacaoQuery(t);
     const atualizadas = await listTransacoes();
@@ -113,6 +136,9 @@ export function ChefIAProvider({ children }: { children: React.ReactNode }) {
       addCliente,
       addPedido,
       updatePedidoStatus,
+      addProduto,
+      updateProduto,
+      deleteProduto,
       addTransacao,
     }),
     [profile, clientes, pedidos, produtos, transacoes, carregando]
