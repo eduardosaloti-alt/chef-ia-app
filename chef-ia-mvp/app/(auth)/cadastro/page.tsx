@@ -14,7 +14,7 @@ export default function CadastroPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(null); const [mensagem, setMensagem] = useState("");
 
   async function criarConta(e: React.FormEvent) {
     e.preventDefault();
@@ -47,7 +47,7 @@ export default function CadastroPage() {
       });
     }
 
-    try {
+    setMensagem("Conta criada! Preparando seu teste grátis de 15 dias..."); await new Promise((resolve) => setTimeout(resolve, 1200)); try {
       const resposta = await fetch("/api/checkout", { method: "POST" });
       const dados = await resposta.json();
       if (dados?.url) {
@@ -89,7 +89,7 @@ export default function CadastroPage() {
           </div>
           {erro && <p className="text-sm text-framboesa">{erro}</p>}
           <Button className="w-full" type="submit" disabled={carregando}>
-            {carregando ? "Criando conta..." : "Criar conta grátis"}
+            {mensagem ? mensagem : carregando ? "Criando conta..." : "Criar conta grátis"}
           </Button>
         </form>
 
