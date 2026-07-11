@@ -109,12 +109,54 @@ export async function listProdutos(): Promise<Produto[]> {
     id: p.id,
     nome: p.nome,
     categoria: p.categoria,
+    rendimento: p.rendimento,
+    ingredientes: p.ingredientes ?? [],
+    custosExtrasPercentual: p.custos_extras_percentual ?? 20,
+    margemDesejada: p.margem_desejada ?? 150,
     custoIngredientes: p.custo_ingredientes,
     custoMaoDeObra: p.custo_mao_de_obra,
     custoFixoRateado: p.custo_fixo_rateado,
-    margemDesejada: p.margem_desejada,
     precoSugerido: p.preco_sugerido,
   }));
+}
+
+export async function addProduto(p: Omit<Produto, "id">) {
+  const supabase = createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  const { error } = await supabase.from("produtos").insert({
+    user_id: auth.user?.id,
+    nome: p.nome,
+    categoria: p.categoria,
+    rendimento: p.rendimento,
+    ingredientes: p.ingredientes,
+    custos_extras_percentual: p.custosExtrasPercentual,
+    margem_desejada: p.margemDesejada,
+    preco_sugerido: p.precoSugerido,
+  });
+  if (error) throw error;
+}
+
+export async function updateProduto(id: string, p: Omit<Produto, "id">) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("produtos")
+    .update({
+      nome: p.nome,
+      categoria: p.categoria,
+      rendimento: p.rendimento,
+      ingredientes: p.ingredientes,
+      custos_extras_percentual: p.custosExtrasPercentual,
+      margem_desejada: p.margemDesejada,
+      preco_sugerido: p.precoSugerido,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteProduto(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("produtos").delete().eq("id", id);
+  if (error) throw error;
 }
 
 export async function listTransacoes(): Promise<Transacao[]> {
