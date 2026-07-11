@@ -70,7 +70,7 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-cacau/10 px-4 py-3 dark:border-cream/10 md:hidden">
+      <div className="flex items-center justify-between border-b border-cacau/10 px-4 py-3 dark:border-cream/10 hidden">
         <p className="font-display text-xl italic text-framboesa">Chef IA</p>
         <button
           onClick={() => setOpen(true)}
@@ -113,7 +113,7 @@ export function Sidebar() {
         </div>
       )}
 
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-cacau/10 px-5 py-8 dark:border-cream/10 md:flex">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-cacau/10 px-5 py-8 dark:border-cream/10">
         <div className="mb-8 flex items-start justify-between px-2">
           <div>
             <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
