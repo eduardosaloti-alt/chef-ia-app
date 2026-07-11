@@ -63,6 +63,10 @@ export function QuizFunil() {
   }
 
   const desafio = respostas[1];
+  const progressoStyle = { width: progresso + "%" };
+  const resultadoTexto = desafio
+    ? 'Voce disse que o maior desafio e: "' + desafio + '". '
+    : "";
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12">
@@ -71,7 +75,7 @@ export function QuizFunil() {
           <div className="h-2 w-full overflow-hidden rounded-full bg-cacau/10 dark:bg-cream/10">
             <div
               className="h-full rounded-full bg-framboesa transition-all duration-300"
-              style={{ width: \`\${progresso}%\` }}
+              style={progressoStyle}
             />
           </div>
           <p className="mt-2 text-xs text-cacau/50 dark:text-cream/50">
@@ -109,7 +113,7 @@ export function QuizFunil() {
             O Chef IA foi feito pra resolver exatamente isso
           </h2>
           <p className="mb-6 text-sm text-cacau/70 dark:text-cream/70">
-            {desafio ? \`Voce disse que o maior desafio e: "\${desafio}". \` : ""}
+            {resultadoTexto}
             Com o Chef IA voce precifica certo, organiza seus pedidos e sua agenda, e enxerga o fluxo de caixa real do seu negocio, tudo em um so lugar.
           </p>
           <Link href="/cadastro">
