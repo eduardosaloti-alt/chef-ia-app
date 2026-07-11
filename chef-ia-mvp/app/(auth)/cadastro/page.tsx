@@ -47,6 +47,17 @@ export default function CadastroPage() {
       });
     }
 
+    try {
+      const resposta = await fetch("/api/checkout", { method: "POST" });
+      const dados = await resposta.json();
+      if (dados?.url) {
+        window.location.href = dados.url;
+        return;
+      }
+    } catch {
+      // segue para o fallback abaixo
+    }
+
     setCarregando(false);
     router.push("/dashboard");
   }
