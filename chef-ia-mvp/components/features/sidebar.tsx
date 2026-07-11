@@ -14,6 +14,8 @@ import {
   CreditCard,
   Menu,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -35,6 +37,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [recolhido, setRecolhido] = useState(false);
 
   async function sair() {
     const supabase = createClient();
@@ -42,7 +45,7 @@ export function Sidebar() {
     router.push("/login");
   }
 
-  function renderLinks(onNavigate?: () => void) {
+  function renderLinks(onNavigate?: () => void, minimizado?: boolean) {
     return (
       <nav className="flex flex-1 flex-col gap-1">
         {links.map(({ href, label, icon: Icon }) => {
@@ -52,15 +55,17 @@ export function Sidebar() {
               key={href}
               href={href as any}
               onClick={onNavigate}
+              title={minimizado ? label : undefined}
               className={clsx(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                minimizado && "justify-center px-2",
                 active
                   ? "bg-framboesa/10 font-medium text-framboesa-dark dark:text-framboesa-light"
                   : "text-cacau/70 hover:bg-cream-soft dark:text-cream/70 dark:hover:bg-cacau-soft"
               )}
             >
               <Icon size={18} />
-              {label}
+              {!minimizado && label}
             </Link>
           );
         })}
@@ -113,24 +118,46 @@ export function Sidebar() {
         </div>
       )}
 
-      <aside className="flex w-64 shrink-0 flex-col border-r border-cacau/10 px-5 py-8 dark:border-cream/10">
+      <aside
+        className={clsx(
+          "relative flex shrink-0 flex-col border-r border-cacau/10 py-8 dark:border-cream/10 transition-all duration-200",
+          recolhido ? "w-20 px-3" : "w-64 px-5"
+        )}
+      >
+        <button
+          onClick={() => setRecolhido(!recolhido)}
+          aria-label={recolhido ? "Expandir menu" : "Minimizar menu"}
+          className="absolute -right-3 top-9 flex h-6 w-6 items-center justify-center rounded-full border border-cacau/10 bg-cream text-cacau/70 shadow-sm hover:bg-cream-soft dark:border-cream/10 dark:bg-cacau dark:text-cream/70 dark:hover:bg-cacau-soft"
+        >
+          {recolhido ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
         <div className="mb-8 flex items-start justify-between px-2">
-          <div>
-            <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
-            <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">Doces da Ana</p>
-          </div>
-          <ThemeToggle />
+          {!recolhido && (
+            <div>
+              <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
+              <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">Doces da Ana</p>
+            </div>
+          )}
+          {!recolhido && <ThemeToggle />}
         </div>
-        {renderLinks()}
+        {renderLinks(undefined, recolhido)}
         <button
           onClick={sair}
-          className="mb-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-cacau/60 transition-colors hover:bg-cream-soft dark:text-cream/60 dark:hover:bg-cacau-soft"
+          title={recolhido ? "Sair" : undefined}
+          className={clsx(
+            "mb-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-cacau/60 transition-colors hover:bg-cream-soft dark:text-cream/60 dark:hover:bg-cacau-soft",
+            recolhido && "justify-center px-2"
+          )}
         >
           <LogOut size={18} />
-          Sair
+          {!recolhido && "Sair"}
         </button>
-        <PipingDivider className="mx-auto mb-3 h-3 w-14 text-framboesa/40" />
-        <p className="text-center text-[11px] text-cacau/40 dark:text-cream/40">Fundadora · R$19,90/mês</p>
+        {!recolhido && (
+          <>
+            <PipingDivider className="mx-auto mb-3 h-3 w-14 text-framboesa/40" />
+            <p className="text-center text-[11px] text-cacau/40 dark:text-cream/40">Fundadora · R$19,90/mês</p>
+          </>
+        )}
       </aside>
     </>
   );
