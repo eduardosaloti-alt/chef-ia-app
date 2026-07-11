@@ -28,14 +28,25 @@ export interface Pedido {
   status: StatusPedido;
 }
 
+export interface Ingrediente {
+  nome: string;
+  quantidadeUsada: number;
+  unidade: string; // ex: "g", "ml", "un"
+  quantidadePacote: number;
+  precoPacote: number;
+}
+
 export interface Produto {
   id: string;
   nome: string;
-  categoria: string;
-  custoIngredientes: number;
-  custoMaoDeObra: number;
-  custoFixoRateado: number;
-  margemDesejada: number;
+  categoria?: string;
+  rendimento?: string; // ex: "1 bolo", "20 unidades"
+  ingredientes: Ingrediente[];
+  custosExtrasPercentual: number; // ex: 20 (%)
+  margemDesejada: number; // markup percentual, ex: 150
+  custoIngredientes?: number;
+  custoMaoDeObra?: number;
+  custoFixoRateado?: number;
   precoSugerido?: number;
 }
 
