@@ -82,7 +82,7 @@ async function abrirCheckout() {
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Button onClick={abrirCheckout} disabled={carregando}>
-                              Assinar agora - R$29,90/mes
+                              Teste grátis por 15 dias
               </Button>
             </div>
           </>
