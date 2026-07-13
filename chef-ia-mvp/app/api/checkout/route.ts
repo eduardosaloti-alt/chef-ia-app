@@ -1,69 +1,109 @@
+import axios from "axios";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * POST /api/checkout
- * Cria uma sessão de checkout do Stripe para a assinatura da Chef IA (preço único
- * de R$29,90/mês, com 15 dias de trial grátis) e retorna a URL de redirecionamento.
+ * Cria uma assinatura no Asaas para a Chef IA (preço único
+ * de R$29,90/mês, com 15 dias de trial grátis) e retorna a URL de pagamento.
  *
  * Promoção "Fundadora": enquanto restarem vagas das 100 primeiras
- * (contar_fundadores() < 100), aplicamos automaticamente o cupom
- * STRIPE_COUPON_ID_FUNDADOR (R$10 de desconto vitalício -> R$19,90/mês para sempre).
- * Se o cupom não puder ser aplicado (ex: esgotou nesse instante), seguimos sem
- * desconto em vez de falhar o checkout.
+ * (contar_fundadores() < 100), aplicamos automaticamente um desconto
+ * (configurável em ASAAS_DISCOUNT_FOUNDER) para as primeiras clientes.
  */
 export async function POST(request: Request) {
-    const supabase = createClient();
-    const {
-          data: { user },
-    } = await supabase.auth.getUser();
+      const supabase = createClient();
+      const {
+              data: { user },
+      } = await supabase.auth.getUser();
 
   if (!user) {
-        return NextResponse.json({ erro: "Você precisa estar logada para assinar." }, { status: 401 });
+          return NextResponse.json(
+              { erro: "Você precisa estar logada para assinar." },
+              { status: 401 }
+                  );
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID_PRO;
-    const couponId = process.env.STRIPE_COUPON_ID_FUNDADOR;
+  try {
+          const vagas = (await supabase.rpc("contar_fundadores"))?.data ?? 0;
+          const aindaHaVagas = vagas < 100;
+          const desconto = aindaHaVagas
+            ? parseInt(process.env.ASAAS_DISCOUNT_FOUNDER || "10")
+                    : 0;
+          const precoBase = parseFloat(process.env.ASAAS_PRICE_MONTHLY || "29.90");
+          const precoComDesconto = precoBase - desconto;
 
-  if (!priceId) {
-        return NextResponse.json(
-          { erro: "Stripe ainda não está configurado (faltam as variáveis de ambiente)." },
-          { status: 500 }
-              );
-  }
+        // Criar cliente no Asaas
+        const clientResponse = await axios.post(
+                  "https://api.asaas.com/v3/customers",
+            {
+                        name:
+                                      user.user_metadata?.name ||
+                                      user.email?.split("@")[0] ||
+                                      "Cliente",
+                        email: user.email,
+                        mobilePhone: user.user_metadata?.phone || null,
+            },
+            {
+                        headers: {
+                                      access_token: process.env.ASAAS_SECRET_KEY,
+                                      "Content-Type": "application/json",
+                        },
+            }
+                );
 
-  const { data: vagas } = await supabase.rpc("contar_fundadores");
-    const aindaHaVagas = (vagas ?? 0) < 100;
-const userEmail = user.email;
-    const userId = user.id;
-    
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    const origin = request.headers.get("origin");
+        const customerId = clientResponse.data.id;
 
-  function montarSessao(comCupom: boolean) {
-        return stripe.checkout.sessions.create({
-                mode: "subscription",
-                                customer_email: userEmail ?? undefined,
-                line_items: [{ price: priceId!, quantity: 1 }],
-                subscription_data: { trial_period_days: 15 },
-                ...(comCupom && couponId ? { discounts: [{ coupon: couponId }] } : {}),
-                success_url: `${origin}/dashboard?assinatura=sucesso`,
-                cancel_url: `${origin}/assinatura`,
-                        metadata: { user_id: userId, plano: comCupom && couponId ? "fundador" : "pro" },
+        // Calcular data do próximo vencimento (15 dias de trial)
+        const nextDueDate = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0];
+
+        // Criar assinatura (recorrência) no Asaas
+        const subscriptionResponse = await axios.post(
+                  "https://api.asaas.com/v3/subscriptions",
+            {
+                        customerId,
+                        billingType: "CREDIT_CARD",
+                        value: precoComDesconto,
+                        nextDueDate,
+                        cycle: "MONTHLY",
+                        description: `Assinatura Chef IA${aindaHaVagas ? " - Plano Fundadora" : ""}`,
+                        maxAttempts: 3,
+            },
+            {
+                        headers: {
+                                      access_token: process.env.ASAAS_SECRET_KEY,
+                                      "Content-Type": "application/json",
+                        },
+            }
+                );
+
+        const subscriptionId = subscriptionResponse.data.id;
+
+        // Salvar informações no banco de dados
+        await supabase.from("usuarios_asaas").insert({
+                  user_id: user.id,
+                  asaas_customer_id: customerId,
+                  asaas_subscription_id: subscriptionId,
+                  plano: aindaHaVagas ? "fundador" : "pro",
+                  status: "aguardando_pagamento",
+                  data_criacao: new Date(),
         });
+
+        // Gerar link de pagamento do Asaas
+        const paymentLink = `https://www.asaas.com/checkout/${subscriptionId}`;
+
+        return NextResponse.json({ url: paymentLink });
+  } catch (error: any) {
+          console.error("Erro ao criar assinatura Asaas:", error.response?.data || error.message);
+          return NextResponse.json(
+              {
+                          erro:
+                                        error.response?.data?.errors?.[0]?.detail ||
+                                        "Erro ao processar pagamento. Tente novamente.",
+              },
+              { status: 500 }
+                  );
   }
-
-  let session;
-    try {
-          session = await montarSessao(aindaHaVagas);
-    } catch (erroCupom) {
-          if (aindaHaVagas) {
-                  session = await montarSessao(false);
-          } else {
-                  throw erroCupom;
-          }
-    }
-
-  return NextResponse.json({ url: session.url });
 }
