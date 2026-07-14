@@ -7,15 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input, Label } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import { perguntas12Otimizadas } from "@/lib/quiz-data";
 interface Pergunta { pergunta: string; ajuda: string; opcoes: string[]; }
 const perguntas: Pergunta[] = [
-  { pergunta: "Qual dessas frases combina mais com voce hoje?", ajuda: "Sem certo ou errado, e so pra a gente entender o momento do seu negocio.", opcoes: ["Ainda nao vendo, mas quero comecar", "Vendo por encomenda pra amigos e familia", "Ja tenho clientes fixos, mas sem organizacao", "Tenho um fluxo grande de pedidos e preciso profissionalizar"] },
-  { pergunta: "Qual e o seu maior desafio na confeitaria hoje?", ajuda: "Essa e a dor que mais aparece entre confeiteiras, vamos usar isso no seu diagnostico.", opcoes: ["Nao sei quanto cobrar pelos meus doces", "Perco prazos porque nao tenho agenda organizada", "Nao sei se estou tendo lucro de verdade no fim do mes", "Uso papel ou planilha e ja nao da mais conta"] },
-  { pergunta: "Com que frequencia voce vende doces?", ajuda: "Isso ajuda a entender o tamanho do seu negocio hoje.", opcoes: ["So em datas especiais", "Toda semana", "Quase todos os dias", "E meu negocio principal, em tempo integral"] },
-  { pergunta: "Hoje voce controla pedidos, precos e contas com o que?", ajuda: "Quanto mais manual, mais tempo e dinheiro escapam sem voce perceber.", opcoes: ["So de cabeca, sem anotar em lugar nenhum", "Caderno ou agenda de papel", "Planilha, tipo Excel ou Google Sheets", "Ja uso algum aplicativo, mas nao e feito pra confeitaria"] },
-  { pergunta: "Uma calculadora que mostra o preco certo de cada doce em segundos mudaria seu negocio?", ajuda: "", opcoes: ["Sim, com certeza", "Ajudaria bastante", "Talvez ajude um pouco"] },
-  { pergunta: "Quanto tempo por semana voce perde organizando pedidos, precos e contas manualmente?", ajuda: "", opcoes: ["Menos de 1 hora", "De 1 a 3 horas", "Mais de 3 horas", "Nem sei dizer, e uma bagunca"] },
-  ];
 type Fase = "intro" | "perguntas" | "contato" | "calculando" | "resultado";
 export function QuizFunil() {
   const [fase, setFase] = useState<Fase>("intro");
