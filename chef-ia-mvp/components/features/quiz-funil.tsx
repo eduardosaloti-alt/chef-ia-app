@@ -5,6 +5,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+{ pergunta: "Qual dessas frases combina mais com voce hoje?", ajuda: "Sem certo ou errado, e so pra a gente entender o momento do seu negocio.", opcoes: ["Ainda nao vendo, mas quero comecar", "Vendo por encomenda pra amigos e familia", "Ja tenho clientes fixos, mas sem organizacao", "Tenho um fluxo grande de pedidos e preciso profissionalizar"] },
+{ pergunta: "Qual e o seu maior desafio na confeitaria hoje?", ajuda: "Essa e a dor que mais aparece entre confeiteiras, vamos usar isso no seu diagnostico.", opcoes: ["Nao sei quanto cobrar pelos meus doces", "Perco prazos porque nao tenho agenda organizada", "Nao sei se estou tendo lucro de verdade no fim do mes", "Uso papel ou planilha e ja nao da mais conta"] },
+{ pergunta: "Com que frequencia voce vende doces?", ajuda: "Isso ajuda a entender o tamanho do seu negocio hoje.", opcoes: ["So em datas especiais", "Toda semana", "Quase todos os dias", "E meu negocio principal, em tempo integral"] },
+{ pergunta: "Hoje voce controla pedidos, precos e contas com o que?", ajuda: "Quanto mais manual, mais tempo e dinheiro escapam sem voce perceber.", opcoes: ["So de cabeca, sem anotar em lugar nenhum", "Caderno ou agenda de papel", "Planilha, tipo Excel ou Google Sheets", "Ja uso algum aplicativo, mas nao e feito pra confeitaria"] },
+{ pergunta: "Uma calculadora que mostra o preco certo de cada doce em segundos mudaria seu negocio?", ajuda: "", opcoes: ["Sim, com certeza", "Ajudaria bastante", "Talvez ajude um pouco"] },
+{ pergunta: "Quanto tempo por semana voce perde organizando pedidos, precos e contas manualmente?", ajuda: "", opcoes: ["Menos de 1 hora", "De 1 a 3 horas", "Mais de 3 horas", "Nem sei dizer, e uma bagunca"] },
+{ pergunta: "O maior problema com seus fornecedores e?", ajuda: "", opcoes: ["Precos altos e sem padronizacao", "Dificuldade em encontrar ingredientes especificos", "Prazos de entrega incertos", "Nao tenho problemas, estou satisfeito"] },
+{ pergunta: "Como voce gostaria de precificar seus produtos?", ajuda: "", opcoes: ["Com base no custo + margem", "Igualando a concorrencia", "Por intuicao/experiencia", "Nao sei como fazer isso corretamente"] },
+{ pergunta: "Qual e o maior sonho para sua confeitaria nos proximos 2 anos?", ajuda: "", opcoes: ["Ter um espaco proprio", "Profissionalizar e ter mais fluxo de pedidos", "Treinar funcionarios e delegar", "Vender para pontos comerciais"] },
+{ pergunta: "Voce ja pensou em usar software pra gerenciar seu negocio?", ajuda: "", opcoes: ["Nunca pensei nisso", "Pensei mas nao sabia por onde comecar", "Tentei alguns mas achei complicado", "Sim, e seria transformador pro meu negocio"] },
+{ pergunta: "Qual e seu maior medo em relacao ao crescimento do seu negocio?", ajuda: "", opcoes: ["Perder a qualidade", "Nao conseguir atender a demanda", "Nao ter dinheiro pra investir", "Nao tenho medo, so quero crescer"] },
+{ pergunta: "Se pudesse mudar uma coisa no seu dia a dia como confeiteira, seria?", ajuda: "", opcoes: ["Ter mais tempo pra descansar", "Ganhar mais dinheiro", "Ter processos mais organizados", "Trabalhar com o que realmente gosto"] }
 import { Input, Label } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { perguntas12Otimizadas } from "@/lib/quiz-data";
