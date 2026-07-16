@@ -23,7 +23,7 @@ async function abrirCheckout() {
                         setErro(dados.erro ?? "Nao foi possivel iniciar o checkout.");
               }
       } catch {
-              setErro("Nao foi possivel conectar ao Stripe agora.");
+              setErro("Nao foi possivel conectar ao checkout agora.");
       } finally {
               setCarregando(false);
       }
