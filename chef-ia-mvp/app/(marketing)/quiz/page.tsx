@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { QuizFunil } from "@/components/features/quiz-funil";
 
 export default function QuizPage() {
   return (
@@ -12,7 +11,11 @@ export default function QuizPage() {
           Entrar
         </Link>
       </header>
-      <QuizFunil />
+      <div className="mx-auto max-w-2xl px-6 py-12 text-center">
+        <p className="text-cacau/70 dark:text-cream/70">
+          Em breve: teste rapido para descobrir se a Chef IA e para voce.
+        </p>
+      </div>
     </div>
   );
 }
