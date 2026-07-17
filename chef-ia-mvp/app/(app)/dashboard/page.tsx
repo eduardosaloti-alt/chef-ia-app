@@ -13,7 +13,7 @@ const statusLabel: Record<string, { label: string; tone: "framboesa" | "dourado"
 };
 
 export default function DashboardPage() {
-  const { pedidos, clientes, transacoes } = useChefIA();
+  const { pedidos, clientes, transacoes, profile } = useChefIA();
 
   const faturamentoMes = transacoes
     .filter((t) => t.tipo === "entrada")
@@ -30,7 +30,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-fade-up">
       <header className="mb-8">
-        <h1 className="font-display text-3xl">Boa tarde, Ana 👋</h1>
+        <h1 className="font-display text-3xl">Boa tarde, {profile.nome?.split(" ")[0] || "Chef"} 👋</h1>
         <p className="mt-1 text-cacau/60 dark:text-cream/60">
           Aqui está o resumo do seu negócio hoje.
         </p>
