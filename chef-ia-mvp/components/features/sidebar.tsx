@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { PipingDivider } from "@/components/ui/piping-divider";
 import { ThemeToggle } from "@/components/features/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
+import { useChefIA } from "@/lib/store";
 
 const links = [
   { href: "/dashboard", label: "Painel", icon: LayoutDashboard },
@@ -38,6 +39,7 @@ export function Sidebar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [recolhido, setRecolhido] = useState(false);
+    const { profile } = useChefIA();
 
   async function sair() {
     const supabase = createClient();
@@ -96,7 +98,7 @@ export function Sidebar() {
             <div className="mb-8 flex items-start justify-between px-2">
               <div>
                 <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
-                <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">Doces da Ana</p>
+                              <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">{profile.nomeNegocio}</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
@@ -135,7 +137,7 @@ export function Sidebar() {
           {!recolhido && (
             <div>
               <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
-              <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">Doces da Ana</p>
+                                          <p className="mt-1 text-xs text-cacau/50 dark:text-cream/50">{profile.nomeNegocio}</p>
             </div>
           )}
           {!recolhido && <ThemeToggle />}
