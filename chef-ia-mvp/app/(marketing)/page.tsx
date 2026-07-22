@@ -12,7 +12,7 @@ export default function LandingPage() {
         <p className="font-display text-2xl italic text-framboesa">Chef IA</p>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm text-cacau/70 dark:text-cream/70">Entrar</Link>
-          <Link href="/cadastro">
+          <Link href="https://cheffia.site/">
             <Button>Comecar gratis</Button>
           </Link>
         </div>
@@ -29,7 +29,7 @@ export default function LandingPage() {
           Tudo em um so lugar, feito para quem vive de confeitar.
         </p>
         <div className="mt-8 flex justify-center gap-3">
-          <Link href="/cadastro">
+          <Link href="https://cheffia.site/">
             <Button>Quero organizar meu negocio</Button>
           </Link>
         </div>
@@ -79,7 +79,7 @@ export default function LandingPage() {
           <p className="mt-2 text-sm text-cacau/60 dark:text-cream/60">
             Travado para sempre, exclusivo para as 100 primeiras confeiteiras. Depois disso, o plano volta para R$39,90/mes.
           </p>
-          <Link href="/cadastro">
+          <Link href="https://cheffia.site/">
             <Button className="mt-6 w-full">Garantir minha vaga</Button>
           </Link>
         </Card>
