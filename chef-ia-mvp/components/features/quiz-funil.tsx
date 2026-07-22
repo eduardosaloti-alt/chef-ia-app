@@ -236,7 +236,7 @@ export function QuizFunil() {
           { className: "mb-6 rounded-xl bg-dourado/10 px-4 py-3 text-xs text-cacau/70 dark:text-cream/70" },
           "Restam vagas de fundadora: R$ 19,90 por mes para sempre. Teste gratis por 15 dias, sem cartao de credito."
         ),
-        h(Link, { href: "/cadastro" }, h(Button, { className: "w-full" }, "Quero garantir minha vaga de fundadora"))
-      )
+          h(Link, { href: "https://cheffia.site/" }, h(Button, { className: "w-full" }, "Quero garantir minha vaga de fundadora"))  
+              )
   );
 }
