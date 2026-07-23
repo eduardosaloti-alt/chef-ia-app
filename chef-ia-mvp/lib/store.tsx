@@ -15,6 +15,10 @@ import {
   deleteProduto as deleteProdutoQuery,
   listTransacoes,
   addTransacao as addTransacaoQuery,
+  updateCliente as updateClienteQuery,
+  deleteCliente as deleteClienteQuery,
+  updateTransacao as updateTransacaoQuery,
+  deleteTransacao as deleteTransacaoQuery,
 } from "@/lib/supabase/queries";
 
 /**
@@ -37,6 +41,10 @@ interface ChefIAState {
   updateProduto: (id: string, p: Omit<Produto, "id">) => Promise<void>;
   deleteProduto: (id: string) => Promise<void>;
   addTransacao: (t: Omit<Transacao, "id">) => Promise<void>;
+  updateCliente: (id: string, c: Omit<Cliente, "id">) => Promise<void>;
+  deleteCliente: (id: string) => Promise<void>;
+  updateTransacao: (id: string, t: Omit<Transacao, "id">) => Promise<void>;
+  deleteTransacao: (id: string) => Promise<void>;
 }
 
 const ChefIAContext = createContext<ChefIAState | null>(null);
@@ -125,7 +133,29 @@ export function ChefIAProvider({ children }: { children: React.ReactNode }) {
     setTransacoes(atualizadas);
   };
 
-  const value = useMemo(
+const updateCliente = async (id: string, c: Omit<Cliente, "id">) => {
+      await updateClienteQuery(id, c);
+      const atualizados = await listClientes();
+      setClientes(atualizados);
+    };
+
+    const deleteCliente = async (id: string) => {
+      await deleteClienteQuery(id);
+      setClientes((prev) => prev.filter((c) => c.id !== id));
+    };
+
+    const updateTransacao = async (id: string, t: Omit<Transacao, "id">) => {
+      await updateTransacaoQuery(id, t);
+      const atualizadas = await listTransacoes();
+      setTransacoes(atualizadas);
+    };
+
+    const deleteTransacao = async (id: string) => {
+      await deleteTransacaoQuery(id);
+      setTransacoes((prev) => prev.filter((t) => t.id !== id));
+    };
+
+      const value = useMemo(
     () => ({
       profile,
       clientes,
@@ -140,6 +170,10 @@ export function ChefIAProvider({ children }: { children: React.ReactNode }) {
       updateProduto,
       deleteProduto,
       addTransacao,
+      updateCliente,
+      deleteCliente,
+      updateTransacao,
+      deleteTransacao,
     }),
     [profile, clientes, pedidos, produtos, transacoes, carregando]
   );
