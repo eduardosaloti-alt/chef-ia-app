@@ -20,104 +20,106 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 const ROTAS_PROTEGIDAS = [
-  "/dashboard",
-  "/clientes",
-  "/pedidos",
-  "/agenda",
-  "/calculadora",
-  "/caixa",
-  "/assinatura",
-  ];
+    "/dashboard",
+    "/clientes",
+    "/pedidos",
+    "/agenda",
+    "/calculadora",
+    "/caixa",
+    "/assinatura",
+    "/conta",
+    ];
 
 const ROTAS_ADMIN = ["/admin"];
 
-const ROTAS_SEM_ASSINATURA = ["/assinatura"];
+const ROTAS_SEM_ASSINATURA = ["/assinatura", "/conta"];
 
 const STATUS_LIBERADOS = ["ativa", "trialing"];
 
 export async function middleware(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const { pathname } = request.nextUrl;
-  const protegida = ROTAS_PROTEGIDAS.some((r) => pathname.startsWith(r));
-  const admin = ROTAS_ADMIN.some((r) => pathname.startsWith(r));
+    const protegida = ROTAS_PROTEGIDAS.some((r) => pathname.startsWith(r));
+    const admin = ROTAS_ADMIN.some((r) => pathname.startsWith(r));
 
 if (!url || !anonKey || (!protegida && !admin)) {
-  return NextResponse.next();
+    return NextResponse.next();
 }
 
 let response = NextResponse.next({ request });
 
 const supabase = createServerClient(url, anonKey, {
-  cookies: {
-    get(name: string) {
-      return request.cookies.get(name)?.value;
+    cookies: {
+          get(name: string) {
+                  return request.cookies.get(name)?.value;
+          },
+          set(name: string, value: string, options: any) {
+                  response.cookies.set({ name, value, ...options });
+          },
+          remove(name: string, options: any) {
+                  response.cookies.set({ name, value: "", ...options });
+          },
     },
-    set(name: string, value: string, options: any) {
-      response.cookies.set({ name, value, ...options });
-    },
-    remove(name: string, options: any) {
-      response.cookies.set({ name, value: "", ...options });
-    },
-  },
 });
 
 const {
-  data: { user },
+    data: { user },
 } = await supabase.auth.getUser();
 
 if (!user) {
-  const redirectUrl = new URL("/login", request.url);
-  return NextResponse.redirect(redirectUrl);
+    const redirectUrl = new URL("/login", request.url);
+    return NextResponse.redirect(redirectUrl);
 }
 
 if (user.email === "kaique.saloti@gmail.com") { return response; } if (admin) {
-  const { data: profile } = await supabase
-  .from("profiles")
-  .select("role")
-  .eq("id", user.id)
-  .single();
+    const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
 
-  if (profile?.role !== "admin") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
+    if (profile?.role !== "admin") {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
 }
 
 const precisaAssinatura =
-  protegida && !ROTAS_SEM_ASSINATURA.some((r) => pathname.startsWith(r));
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    protegida && !ROTAS_SEM_ASSINATURA.some((r) => pathname.startsWith(r));
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (precisaAssinatura && serviceKey) {
-  const supabaseAdmin = createServiceClient(url, serviceKey);
-  const { data: assinatura } = await supabaseAdmin
-  .from("assinaturas")
-  .select("status")
-  .eq("user_id", user.id)
-  .order("id", { ascending: false })
-  .limit(1)
-  .maybeSingle();
+    const supabaseAdmin = createServiceClient(url, serviceKey);
+    const { data: assinatura } = await supabaseAdmin
+    .from("assinaturas")
+    .select("status")
+    .eq("user_id", user.id)
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  const assinaturaAtiva =
-    assinatura && STATUS_LIBERADOS.includes(assinatura.status);
+    const assinaturaAtiva =
+          assinatura && STATUS_LIBERADOS.includes(assinatura.status);
 
-  if (!assinaturaAtiva) {
-    return NextResponse.redirect(new URL("/assinatura", request.url));
-  }
+    if (!assinaturaAtiva) {
+          return NextResponse.redirect(new URL("/assinatura", request.url));
+    }
 }
 
 return response;
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/clientes/:path*",
-    "/pedidos/:path*",
-    "/agenda/:path*",
-    "/calculadora/:path*",
-    "/caixa/:path*",
-    "/assinatura/:path*",
-    "/admin/:path*",
-    ],
-};
+    matcher: [
+          "/dashboard/:path*",
+          "/clientes/:path*",
+          "/pedidos/:path*",
+          "/agenda/:path*",
+          "/calculadora/:path*",
+          "/caixa/:path*",
+          "/assinatura/:path*",
+          "/admin/:path*",
+          "/conta/:path*",
+          ],
+}
