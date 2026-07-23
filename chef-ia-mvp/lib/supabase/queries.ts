@@ -197,3 +197,45 @@ export async function contarFundadores(): Promise<number> {
   if (error) return 0;
   return data as number;
 }
+
+
+export async function updateCliente(id: string, cliente: Omit<Cliente, "id">): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("clientes")
+    .update({
+      nome: cliente.nome,
+      whatsapp: cliente.whatsapp,
+      aniversario: cliente.aniversario,
+      observacoes: cliente.observacoes,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteCliente(id: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from("clientes").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateTransacao(id: string, transacao: Omit<Transacao, "id">): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("transacoes")
+    .update({
+      tipo: transacao.tipo,
+      categoria: transacao.categoria,
+      descricao: transacao.descricao,
+      valor: transacao.valor,
+      data: transacao.data,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTransacao(id: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from("transacoes").delete().eq("id", id);
+  if (error) throw error;
+}
