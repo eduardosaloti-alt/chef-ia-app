@@ -12,6 +12,7 @@ import {
   Calculator,
   Wallet,
   CreditCard,
+  KeyRound,
   Menu,
   X,
   ChevronLeft,
@@ -32,6 +33,7 @@ const links = [
   { href: "/calculadora", label: "Precificação", icon: Calculator },
   { href: "/caixa", label: "Fluxo de caixa", icon: Wallet },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
+  { href: "/conta", label: "Minha conta", icon: KeyRound },
 ];
 
 export function Sidebar() {
