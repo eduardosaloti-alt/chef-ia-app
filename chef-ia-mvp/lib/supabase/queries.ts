@@ -98,6 +98,21 @@ export async function updatePedidoStatus(id: string, status: Pedido["status"]) {
   if (error) throw error;
 }
 
+export async function updatePedidoQuery(id: string, p: Omit<Pedido, "id">) {
+  const supabase = createClient();
+  const { error } = await supabase
+  .from("pedidos")
+  .update({
+    cliente_id: p.clienteId,
+    produto_descricao: p.produtoDescricao,
+    valor: p.valor,
+    data_entrega: p.dataEntrega,
+    status: p.status,
+  })
+  .eq("id", id);
+  if (error) throw error;
+}
+
 export async function listProdutos(): Promise<Produto[]> {
   const supabase = createClient();
   const { data, error } = await supabase
