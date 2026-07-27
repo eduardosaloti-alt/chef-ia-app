@@ -9,6 +9,7 @@ import {
   listPedidos,
   addPedido as addPedidoQuery,
   updatePedidoStatus as updatePedidoStatusQuery,
+  updatePedido as updatePedidoQuery,
   listProdutos,
   addProduto as addProdutoQuery,
   updateProduto as updateProdutoQuery,
@@ -37,6 +38,7 @@ interface ChefIAState {
   addCliente: (c: Omit<Cliente, "id">) => Promise<void>;
   addPedido: (p: Omit<Pedido, "id">) => Promise<void>;
   updatePedidoStatus: (id: string, status: Pedido["status"]) => Promise<void>;
+  updatePedido: (id: string, p: Omit<Pedido, "id">) => Promise<void>;
   addProduto: (p: Omit<Produto, "id">) => Promise<void>;
   updateProduto: (id: string, p: Omit<Produto, "id">) => Promise<void>;
   deleteProduto: (id: string) => Promise<void>;
@@ -110,6 +112,12 @@ export function ChefIAProvider({ children }: { children: React.ReactNode }) {
     await updatePedidoStatusQuery(id, status);
   };
 
+  const updatePedido = async (id: string, p: Omit<Pedido, "id">) => {                                 
+    await updatePedidoQuery(id, p);
+    const atualizados = await listPedidos();
+    setPedidos(atualizados);
+  };
+
   const addProduto = async (p: Omit<Produto, "id">) => {
     await addProdutoQuery(p);
     const atualizados = await listProdutos();
@@ -166,6 +174,7 @@ const updateCliente = async (id: string, c: Omit<Cliente, "id">) => {
       addCliente,
       addPedido,
       updatePedidoStatus,
+      updatePedido,
       addProduto,
       updateProduto,
       deleteProduto,
