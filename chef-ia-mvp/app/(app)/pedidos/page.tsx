@@ -9,7 +9,7 @@ import { Input, Label } from "@/components/ui/input";
 import type { StatusPedido } from "@/types";
 
 function formatDateBR(dateStr: string) {
-    const [year, month, day] = dateStr.split("-");
+    const [year, month, day] = dateStr.slice(0, 10).split("-");
     return `${day}/${month}/${year}`;
 }
 
@@ -22,27 +22,63 @@ const statusOptions: { value: StatusPedido; label: string; tone: "framboesa" | "
 ];
 
 export default function PedidosPage() {
-  const { pedidos, clientes, addPedido, updatePedidoStatus } = useChefIA();
+    const { pedidos, clientes, addPedido, updatePedido, updatePedidoStatus } = useChefIA();
   const [aberto, setAberto] = useState(false);
   const [clienteId, setClienteId] = useState(clientes[0]?.id ?? "");
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [dataEntrega, setDataEntrega] = useState("");
+    const [editandoId, setEditandoId] = useState<string | null>(null);
+    const [statusEdicao, setStatusEdicao] = useState<StatusPedido>("novo");
 
-  function salvar() {
-    if (!descricao.trim() || !valor || !dataEntrega || !clienteId) return;
-    addPedido({
-      clienteId,
-      produtoDescricao: descricao,
-      valor: parseFloat(valor),
-      dataEntrega,
-      status: "novo",
-    });
+function abrirNovo() {
+    setEditandoId(null);
+    setStatusEdicao("novo");
+    setClienteId(clientes[0]?.id ?? "");
     setDescricao("");
     setValor("");
     setDataEntrega("");
-    setAberto(false);
-  }
+    setAberto(true);
+}
+
+    function abrirEdicao(p: (typeof pedidos)[number]) {
+                setEditandoId(p.id);
+                setStatusEdicao(p.status);
+                setClienteId(p.clienteId);
+                setDescricao(p.produtoDescricao);
+                setValor(String(p.valor));
+                setDataEntrega(p.dataEntrega.slice(0, 10));
+                setAberto(true);
+    }
+    function fechar() {
+        setAberto(false);
+        setEditandoId(null);
+        setDescricao("");
+        setValor("");
+        setDataEntrega("");
+    }
+
+    function salvar() {
+        if (!descricao.trim() || !valor || !dataEntrega || !clienteId) return;
+        if (editandoId) {
+            updatePedido(editandoId, {
+                clienteId,
+                produtoDescricao: descricao,
+                valor: parseFloat(valor),
+                dataEntrega,
+                status: statusEdicao,
+            });
+        } else {
+            addPedido({
+                clienteId,
+                produtoDescricao: descricao,
+                valor: parseFloat(valor),
+                dataEntrega,
+                status: "novo",
+            });
+        }
+        fechar();
+    }
 
   return (
     <div className="animate-fade-up">
@@ -51,7 +87,7 @@ export default function PedidosPage() {
           <h1 className="font-display text-3xl">Pedidos</h1>
           <p className="mt-1 text-cacau/60 dark:text-cream/60">{pedidos.length} pedidos no total</p>
         </div>
-        <Button onClick={() => setAberto((v) => !v)}>{aberto ? "Cancelar" : "Novo pedido"}</Button>
+        <Button onClick={() => (aberto ? fechar() : abrirNovo())>{aberto ? "Cancelar" : "Novo pedido"}</Button>
       </header>
 
       {aberto && (
@@ -81,7 +117,7 @@ export default function PedidosPage() {
             <Label htmlFor="data">Data de entrega</Label>
             <Input id="data" type="date" value={dataEntrega} onChange={(e) => setDataEntrega(e.target.value)} />
           </div>
-          <Button onClick={salvar}>Salvar pedido</Button>
+          <Button onClick={salvar}>{editandoId ? "Salvar edição" : "Salvar pedido"}</Button>
         </Card>
       )}
 
@@ -105,6 +141,7 @@ export default function PedidosPage() {
                       </Badge>
                     </button>
                   ))}
+                    <button onClick={() => abrirEdicao(p)} className="ml-1 text-xs font-medium text-cacau/60 underline-offset-2 hover:underline dark:text-cream/60">Editar</button>
                 </div>
               </div>
             );
