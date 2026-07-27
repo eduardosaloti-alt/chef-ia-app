@@ -87,7 +87,7 @@ function abrirNovo() {
           <h1 className="font-display text-3xl">Pedidos</h1>
           <p className="mt-1 text-cacau/60 dark:text-cream/60">{pedidos.length} pedidos no total</p>
         </div>
-        <Button onClick={() => (aberto ? fechar() : abrirNovo())>{aberto ? "Cancelar" : "Novo pedido"}</Button>
+        <Button onClick={() => (aberto ? fechar() : abrirNovo()})>{aberto ? "Cancelar" : "Novo pedido"}</Button>
       </header>
 
       {aberto && (
