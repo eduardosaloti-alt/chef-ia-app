@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input, Label } from "@/components/ui/input";
 import type { StatusPedido } from "@/types";
 
+function formatDateBR(dateStr: string) {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 const statusOptions: { value: StatusPedido; label: string; tone: "framboesa" | "dourado" | "pistache" | "neutro" }[] = [
   { value: "novo", label: "Novo", tone: "neutro" },
   { value: "producao", label: "Em produção", tone: "dourado" },
@@ -89,7 +94,7 @@ export default function PedidosPage() {
                 <div>
                   <p className="text-sm font-medium">{p.produtoDescricao}</p>
                   <p className="text-xs text-cacau/50 dark:text-cream/50">
-                    {cliente?.nome} · Entrega em {new Date(p.dataEntrega).toLocaleDateString("pt-BR")} · R$ {p.valor.toFixed(2)}
+                    {cliente?.nome} · Entrega em {formatDateBR(p.dataEntrega))} · R$ {p.valor.toFixed(2)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
