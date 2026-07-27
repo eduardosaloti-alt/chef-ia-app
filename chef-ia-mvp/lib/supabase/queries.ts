@@ -98,7 +98,7 @@ export async function updatePedidoStatus(id: string, status: Pedido["status"]) {
   if (error) throw error;
 }
 
-export async function updatePedidoQuery(id: string, p: Omit<Pedido, "id">) {
+export async function updatePedido(id: string, p: Omit<Pedido, "id">) {
   const supabase = createClient();
   const { error } = await supabase
   .from("pedidos")
