@@ -254,3 +254,10 @@ export async function deleteTransacao(id: string): Promise<void> {
   const { error } = await supabase.from("transacoes").delete().eq("id", id);
   if (error) throw error;
 }
+
+
+export async function deletePedido(id: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from("pedidos").delete().eq("id", id);
+  if (error) throw error;
+}
