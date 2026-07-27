@@ -22,7 +22,7 @@ const statusOptions: { value: StatusPedido; label: string; tone: "framboesa" | "
 ];
 
 export default function PedidosPage() {
-    const { pedidos, clientes, addPedido, updatePedido, updatePedidoStatus } = useChefIA();
+    const { pedidos, clientes, addPedido, updatePedido, deletePedido, updatePedidoStatus } = useChefIA();
   const [aberto, setAberto] = useState(false);
   const [clienteId, setClienteId] = useState(clientes[0]?.id ?? "");
   const [descricao, setDescricao] = useState("");
@@ -142,6 +142,7 @@ function abrirNovo() {
                     </button>
                   ))}
                     <button onClick={() => abrirEdicao(p)} className="ml-1 text-xs font-medium text-cacau/60 underline-offset-2 hover:underline dark:text-cream/60">Editar</button>
+                    <button onClick={() => { if (confirm("Excluir este pedido?")) deletePedido(p.id); }} className="ml-1 text-xs font-medium text-cacau/60 underline-offset-2 hover:underline dark:text-cream/60">Excluir</button>
                 </div>
               </div>
             );
