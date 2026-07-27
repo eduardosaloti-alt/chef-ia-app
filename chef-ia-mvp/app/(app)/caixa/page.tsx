@@ -9,6 +9,11 @@ import { Input, Label } from "@/components/ui/input";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import type { TipoTransacao } from "@/types";
 
+function formatDateBR(dateStr: string) {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 export default function CaixaPage() {
   const { transacoes, addTransacao, updateTransacao, deleteTransacao } = useChefIA();
   const [aberto, setAberto] = useState(false);
@@ -28,7 +33,7 @@ export default function CaixaPage() {
   const dadosGrafico = ordenadas.map((t) => {
     acumulado += t.tipo === "entrada" ? t.valor : -t.valor;
     return {
-      data: new Date(t.data).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+      data: formatDateBR(t.data).slice(0, 5),
       saldo: acumulado,
     };
   });
@@ -171,7 +176,7 @@ export default function CaixaPage() {
               <div>
                 <div className="text-sm font-medium">{t.descricao}</div>
                 <div className="text-xs text-cacau/50 dark:text-cream/50">
-                  {t.categoria} · {new Date(t.data).toLocaleDateString("pt-BR")}
+                  {t.categoria} · {formatDateBR(t.data)}
                 </div>
               </div>
               <div className="flex items-center gap-3">
