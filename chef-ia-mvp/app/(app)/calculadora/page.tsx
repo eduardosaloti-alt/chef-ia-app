@@ -14,7 +14,7 @@ import {
 } from "@/lib/ai/precificacao-ingredientes";
 import { Plus, Trash2 } from "lucide-react";
 
-const SUGESTOES_NOME = ["Bolo confeitado", "Docinhos", "Bolo no pote", "Bolo caseiro", "Bolo de festa"];
+const SUGESTOES_NOME = ["Bolo confeitado", "Docinhos", "Bolo no pote", "Bolo caseiro", "Bolo de festa", "Sobremesa"];
 
 const UNIDADES = ["g", "kg", "ml", "L", "un"];
 
