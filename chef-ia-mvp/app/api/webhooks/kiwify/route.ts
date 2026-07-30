@@ -140,10 +140,14 @@ export async function POST(request: Request) {
 
     await atualizarAssinatura(supabase, userId, "cancelada", planoInfo.plano, planoInfo.valor, null);
     } else if (evento === "subscription_late") {
-    // Mantemos o plano ativo durante o atraso (regra a confirmar com o time de
-                                                // negocio); so marcamos o status da assinatura como atrasada.
-    await atualizarAssinatura(supabase, userId, "atrasada", planoInfo.plano, planoInfo.valor, proximaCobranca);
-    }
+          // Corta o acesso da assinante enquanto o pagamento estiver atrasado.
+          await supabase
+            .from("profiles")
+            .update({ plano: "gratuito", fundador: false, preco_travado: null })
+            .eq("id", userId);
+
+          await atualizarAssinatura(supabase, userId, "atrasada", planoInfo.plano, planoInfo.valor, null);
+  }
 
   return NextResponse.json({ ok: true });
   }
