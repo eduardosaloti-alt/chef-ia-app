@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Cliente, Pedido, Produto, Profile, Transacao } from "@/types";
+import type { Insumo, Cliente, Pedido, Produto, Profile, Transacao } from "@/types";
 
 /**
  * Estas funções espelham exatamente os métodos de `lib/store.tsx`.
@@ -260,4 +260,35 @@ export async function deletePedido(id: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.from("pedidos").delete().eq("id", id);
   if (error) throw error;
+}
+
+export async function listInsumos(): Promise<Insumo[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("insumos")
+      .select("*")
+      .order("criado_em", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((i) => ({
+          id: i.id,
+          nome: i.nome,
+          unidade: i.unidade,
+          quantidadeEstoque: i.quantidade_estoque,
+          quantidadeMinima: i.quantidade_minima,
+          custoUnitario: i.custo_unitario,
+    }));
+}
+
+export async function addInsumo(i: Omit<Insumo, "id">) {
+    const supabase = createClient();
+    const { data: auth } = await supabase.auth.getUser();
+    const { error } = await supabase.from("insumos").insert({
+          user_id: auth.user?.id,
+          nome: i.nome,
+          unidade: i.unidade,
+          quantidade_estoque: i.quantidadeEstoque,
+          quantidade_minima: i.quantidadeMinima,
+          custo_unitario: i.custoUnitario,
+    });
+    if (error) throw error;
 }

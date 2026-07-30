@@ -60,3 +60,12 @@ export interface Transacao {
   valor: number;
   data: string; // ISO date
 }
+
+export interface Insumo {
+    id: string;
+    nome: string;
+    unidade: string; // ex: "g", "ml", "un"
+  quantidadeEstoque: number;
+    quantidadeMinima: number;
+    custoUnitario: number;
+}
