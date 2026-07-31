@@ -10,6 +10,9 @@ import {
   CalendarDays,
   ClipboardList,
   Calculator,
+    Package,
+    Sparkles,
+  BarChart2,
   Wallet,
   CreditCard,
   KeyRound,
@@ -31,6 +34,9 @@ const links = [
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/pedidos", label: "Pedidos", icon: ClipboardList },
   { href: "/calculadora", label: "Precificação", icon: Calculator },
+  { href: "/estoque", label: "Estoque", icon: Package, premium: true },
+  { href: "/receitas", label: "Receitas com IA", icon: Sparkles, premium: true },
+  { href: "/relatorios", label: "Relatórios", icon: BarChart2, premium: true },
   { href: "/caixa", label: "Fluxo de caixa", icon: Wallet },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
   { href: "/conta", label: "Minha conta", icon: KeyRound },
@@ -50,9 +56,10 @@ export function Sidebar() {
   }
 
   function renderLinks(onNavigate?: () => void, minimizado?: boolean) {
+            const linksVisiveis = links.filter((l: any) => !l.premium || profile.plano === "premium");
     return (
       <nav className="flex flex-1 flex-col gap-1">
-        {links.map(({ href, label, icon: Icon }) => {
+        {linksVisiveis.map(({ href, label, icon: Icon }) => {
           const active = pathname?.startsWith(href);
           return (
             <Link
