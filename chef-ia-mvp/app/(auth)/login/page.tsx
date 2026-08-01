@@ -66,6 +66,7 @@ export default function LoginPage() {
             <Label htmlFor="senha">Senha</Label>
             <Input id="senha" type="password" required value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="••••••••" />
           </div>
+          <div className="text-right"><Link href="/esqueci-senha" className="text-sm font-medium text-framboesa">Esqueci minha senha</Link></div>
           {erro && <p className="text-sm text-framboesa">{erro}</p>}
           <Button className="w-full" type="submit" disabled={carregando}>
             {carregando ? "Entrando..." : "Entrar"}
