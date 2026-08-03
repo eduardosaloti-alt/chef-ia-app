@@ -14,11 +14,14 @@ const statusLabel: Record<string, { label: string; tone: "framboesa" | "dourado"
 
 export default function DashboardPage() {
   const { pedidos, clientes, transacoes, profile } = useChefIA();
+  const hoje = new Date();
+  const mesAtualStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+  const transacoesDoMes = transacoes.filter((t) => t.data.startsWith(mesAtualStr));
 
-  const faturamentoMes = transacoes
+  const faturamentoMes = transacoesDoMes
     .filter((t) => t.tipo === "entrada")
     .reduce((acc, t) => acc + t.valor, 0);
-  const despesasMes = transacoes
+  const despesasMes = transacoesDoMes
     .filter((t) => t.tipo === "saida")
     .reduce((acc, t) => acc + t.valor, 0);
   const lucroEstimado = faturamentoMes - despesasMes;
