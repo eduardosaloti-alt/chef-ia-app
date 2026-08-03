@@ -16,6 +16,9 @@ function formatDateBR(dateStr: string) {
 
 export default function CaixaPage() {
   const { transacoes, addTransacao, updateTransacao, deleteTransacao } = useChefIA();
+      const hoje = new Date();
+      const mesAtualStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+        const transacoesDoMes = transacoes.filter((t) => t.data.startsWith(mesAtualStr));
   const [aberto, setAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [tipo, setTipo] = useState<TipoTransacao>("entrada");
@@ -24,11 +27,11 @@ export default function CaixaPage() {
   const [valor, setValor] = useState("");
   const [data, setData] = useState("2026-07-08");
 
-  const entradas = transacoes.filter((t) => t.tipo === "entrada").reduce((acc, t) => acc + t.valor, 0);
-  const saidas = transacoes.filter((t) => t.tipo === "saida").reduce((acc, t) => acc + t.valor, 0);
+  const entradas = transacoesDoMes.filter((t) => t.tipo === "entrada").reduce((acc, t) => acc + t.valor, 0);
+  const saidas = transacoesDoMes.filter((t) => t.tipo === "saida").reduce((acc, t) => acc + t.valor, 0);
   const saldo = entradas - saidas;
 
-  const ordenadas = [...transacoes].sort((a, b) => a.data.localeCompare(b.data));
+  const ordenadas = [...transacoesDoMes].sort((a, b) => a.data.localeCompare(b.data));
   let acumulado = 0;
   const dadosGrafico = ordenadas.map((t) => {
     acumulado += t.tipo === "entrada" ? t.valor : -t.valor;
@@ -144,15 +147,15 @@ export default function CaixaPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
-          <div className="text-xs text-cacau/50 dark:text-cream/50">Entradas</div>
+          <div className="text-xs text-cacau/50 dark:text-cream/50">Entradas (mes)</div>
           <div className="mt-2 font-mono text-xl text-pistache">R$ {entradas.toFixed(2)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-cacau/50 dark:text-cream/50">Saídas</div>
+          <div className="text-xs text-cacau/50 dark:text-cream/50">Saídas (mes)</div>
           <div className="mt-2 font-mono text-xl text-framboesa">R$ {saidas.toFixed(2)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-cacau/50 dark:text-cream/50">Saldo</div>
+          <div className="text-xs text-cacau/50 dark:text-cream/50">Saldo (mes)</div>
           <div className="mt-2 font-mono text-xl">R$ {saldo.toFixed(2)}</div>
         </Card>
       </div>
@@ -171,7 +174,7 @@ export default function CaixaPage() {
 
       <Card>
         <div className="flex flex-col divide-y divide-cacau/10 dark:divide-cream/10">
-          {[...transacoes].reverse().map((t) => (
+          {[...transacoesDoMes].reverse().map((t) => (
             <div key={t.id} className="flex items-center justify-between py-3">
               <div>
                 <div className="text-sm font-medium">{t.descricao}</div>
