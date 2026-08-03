@@ -248,7 +248,6 @@ export default function CalculadoraPage() {
                                             <Input value={novoInsumoCusto} onChange={(e) => setNovoInsumoCusto(e.target.value)} placeholder="Custo por unidade" />
                                             <Button type="button" variant="secondary" onClick={salvarNovoInsumo}>Salvar insumo</Button>
                             </div>
-            </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] border-collapse text-sm">
