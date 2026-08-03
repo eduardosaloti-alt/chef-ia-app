@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { PipingDivider } from "@/components/ui/piping-divider";
-import type { Ingrediente, Produto } from "@/types";
+import type { Ingrediente, Produto, Insumo } from "@/types";
 import {
   calcularCustoIngrediente,
   calcularPrecificacaoIngredientes,
@@ -24,7 +24,7 @@ function formatarReal(valor: number) {
 }
 
 export default function CalculadoraPage() {
-  const { produtos, addProduto, updateProduto, deleteProduto } = useChefIA();
+  const { produtos, addProduto, updateProduto, deleteProduto, insumos, addInsumo } = useChefIA();
 
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [emEdicao, setEmEdicao] = useState(false);
@@ -33,6 +33,9 @@ export default function CalculadoraPage() {
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([novoIngrediente()]);
   const [custosExtrasPercentual, setCustosExtrasPercentual] = useState(20);
   const [margemDesejada, setMargemDesejada] = useState(150);
+    const [novoInsumoNome, setNovoInsumoNome] = useState("");
+    const [novoInsumoUnidade, setNovoInsumoUnidade] = useState("g");
+    const [novoInsumoCusto, setNovoInsumoCusto] = useState("");
   const [salvando, setSalvando] = useState(false);
 
   function iniciarNova(sugestao?: string) {
@@ -74,6 +77,31 @@ export default function CalculadoraPage() {
   function removerIngrediente(index: number) {
     setIngredientes((prev) => prev.filter((_, i) => i !== index));
   }
+
+    function usarInsumo(insumo: Insumo) {
+          setIngredientes((prev) => [
+                  ...prev,
+            {
+                      nome: insumo.nome,
+                      quantidadeUsada: 0,
+                      unidade: insumo.unidade,
+                      quantidadePacote: 1,
+                      precoPacote: insumo.custoUnitario,
+            },
+                ]);
+    }
+
+    async function salvarNovoInsumo() {
+          if (!novoInsumoNome.trim()) return;
+          await addInsumo({
+                  nome: novoInsumoNome.trim(),
+                  unidade: novoInsumoUnidade || "g",
+                  custoUnitario: parseFloat(novoInsumoCusto) || 0,
+          });
+          setNovoInsumoNome("");
+          setNovoInsumoUnidade("g");
+          setNovoInsumoCusto("");
+    }
 
   const resultado = calcularPrecificacaoIngredientes(ingredientes, custosExtrasPercentual, margemDesejada);
 
@@ -199,6 +227,28 @@ export default function CalculadoraPage() {
                   ))}
                 </div>
               )}
+
+                            <div className="mb-4 flex flex-wrap items-end gap-2 rounded-lg border border-cacau/10 p-3 dark:border-cream/10">
+                                            <select
+                                                                className="rounded-md border border-cacau/20 bg-transparent px-3 py-2 text-sm dark:border-cream/20"
+                                                                value=""
+                                                                onChange={(e) => {
+                                                                                      const insumoSelecionado = insumos.find((i) => i.id === e.target.value);
+                                                                                      if (insumoSelecionado) usarInsumo(insumoSelecionado);
+                                                                                      e.target.value = "";
+                                                                }}
+                                                              >
+                                                              <option value="">+ Adicionar insumo salvo...</option>
+                                              {insumos.map((ins) => (
+                                                                                    <option key={ins.id} value={ins.id}>{ins.nome}</option>
+                                                                                  ))}
+                                            </select>
+                                            <Input value={novoInsumoNome} onChange={(e) => setNovoInsumoNome(e.target.value)} placeholder="Novo insumo: nome" />
+                                            <Input value={novoInsumoUnidade} onChange={(e) => setNovoInsumoUnidade(e.target.value)} placeholder="Unidade" />
+                                            <Input value={novoInsumoCusto} onChange={(e) => setNovoInsumoCusto(e.target.value)} placeholder="Custo por unidade" />
+                                            <Button type="button" variant="secondary" onClick={salvarNovoInsumo}>Salvar insumo</Button>
+                            </div>
+            </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] border-collapse text-sm">
