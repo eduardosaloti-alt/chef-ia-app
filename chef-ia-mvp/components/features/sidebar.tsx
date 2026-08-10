@@ -166,7 +166,7 @@ export function Sidebar() {
         {!recolhido && (
           <>
             <PipingDivider className="mx-auto mb-3 h-3 w-14 text-framboesa/40" />
-            <p className="text-center text-[11px] text-cacau/40 dark:text-cream/40">Fundadora · R$19,90/mês</p>
+            <p className="text-center text-[11px] text-cacau/40 dark:text-cream/40">Fundadora · R$29,90/mês</p>
           </>
         )}
       </aside>
