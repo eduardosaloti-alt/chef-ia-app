@@ -20,7 +20,7 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="mx-auto max-w-3xl px-6 pb-16 pt-12 text-center">
-        <Badge tone="dourado" className="mb-6">Restam vagas de fundadora, R$19,90/mes para sempre</Badge>
+        <Badge tone="dourado" className="mb-6">Restam vagas de fundadora, R$29,90/mes para sempre</Badge>
         <h1 className="font-display text-4xl leading-tight sm:text-6xl">
           A inteligencia artificial <em className="text-framboesa not-italic">da confeitaria</em>.
         </h1>
@@ -74,7 +74,7 @@ export default function LandingPage() {
         <Card>
           <Badge tone="dourado" className="mb-3">Oferta de fundadora</Badge>
           <p className="font-display text-4xl">
-            R$ 19,90<span className="text-base text-cacau/50 dark:text-cream/50">/mes</span>
+            R$ 29,90<span className="text-base text-cacau/50 dark:text-cream/50">/mes</span>
           </p>
           <p className="mt-2 text-sm text-cacau/60 dark:text-cream/60">
             Travado para sempre, exclusivo para as 100 primeiras confeiteiras. Depois disso, o plano volta para R$39,90/mes.
