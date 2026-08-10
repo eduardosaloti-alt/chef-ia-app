@@ -91,10 +91,9 @@ async function abrirCheckout() {
       </Card>
 
       <Card>
-        <h2 className="mb-3 font-display text-lg">Como funciona o preço de fundadora</h2>
+        <h2 className="mb-3 font-display text-lg">Como funciona o preço da assinatura</h2>
         <p className="text-sm text-cacau/60 dark:text-cream/60">
-          As primeiras 100 confeiteiras pagam R$19,90/mês para sempre. Depois de preenchidas as
-                        100 vagas, o valor passa a ser R$29,90/mes.
+        A assinatura Chef IA custa R$29,90/mes.
         </p>
       </Card>
     </div>
