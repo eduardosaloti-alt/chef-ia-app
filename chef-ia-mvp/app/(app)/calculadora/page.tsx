@@ -10,6 +10,7 @@ import type { Ingrediente, Produto, Insumo } from "@/types";
 import {
   calcularCustoIngrediente,
   calcularPrecificacaoIngredientes,
+  interpretarQuantidade,
   novoIngrediente,
 } from "@/lib/ai/precificacao-ingredientes";
 import { Plus, Trash2 } from "lucide-react";
@@ -31,6 +32,9 @@ export default function CalculadoraPage() {
   const [nome, setNome] = useState("");
   const [rendimento, setRendimento] = useState("");
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([novoIngrediente()]);
+  const [textosQtd, setTextosQtd] = useState<{ usada: string; pacote: string }[]>([
+    { usada: "", pacote: "" },
+  ]);
   const [custosExtrasPercentual, setCustosExtrasPercentual] = useState(20);
   const [margemDesejada, setMargemDesejada] = useState(150);
     const [novoInsumoNome, setNovoInsumoNome] = useState("");
@@ -38,11 +42,19 @@ export default function CalculadoraPage() {
     const [novoInsumoCusto, setNovoInsumoCusto] = useState("");
   const [salvando, setSalvando] = useState(false);
 
+  function textoDeIngrediente(ing: Ingrediente) {
+    return {
+      usada: ing.quantidadeUsada ? String(ing.quantidadeUsada) : "",
+      pacote: ing.quantidadePacote ? String(ing.quantidadePacote) : "",
+    };
+  }
+
   function iniciarNova(sugestao?: string) {
     setEditandoId(null);
     setNome(sugestao ?? "");
     setRendimento("");
     setIngredientes([novoIngrediente()]);
+    setTextosQtd([{ usada: "", pacote: "" }]);
     setCustosExtrasPercentual(20);
     setMargemDesejada(150);
     setEmEdicao(true);
@@ -52,7 +64,9 @@ export default function CalculadoraPage() {
     setEditandoId(p.id);
     setNome(p.nome);
     setRendimento(p.rendimento ?? "");
-    setIngredientes(p.ingredientes && p.ingredientes.length > 0 ? p.ingredientes : [novoIngrediente()]);
+    const ings = p.ingredientes && p.ingredientes.length > 0 ? p.ingredientes : [novoIngrediente()];
+    setIngredientes(ings);
+    setTextosQtd(ings.map(textoDeIngrediente));
     setCustosExtrasPercentual(p.custosExtrasPercentual ?? 20);
     setMargemDesejada(p.margemDesejada ?? 150);
     setEmEdicao(true);
@@ -70,25 +84,43 @@ export default function CalculadoraPage() {
     );
   }
 
+  /**
+   * Atualiza os campos "Qtd. usada" e "Qtd. do pacote". Aceita tanto um
+   * numero puro (200, 1000...) quanto o numero com a unidade junto
+   * (200gr, 1kg...), pra facilitar pra quem prefere escrever assim. Ao
+   * reconhecer uma unidade digitada, o campo "Un." e atualizado sozinho.
+   */
+  function atualizarQuantidadeTexto(index: number, campo: "usada" | "pacote", texto: string) {
+    setTextosQtd((prev) => prev.map((t, i) => (i === index ? { ...t, [campo]: texto } : t)));
+    const { valor, unidade } = interpretarQuantidade(texto);
+    const campoIngrediente = campo === "usada" ? "quantidadeUsada" : "quantidadePacote";
+    setIngredientes((prev) =>
+      prev.map((ing, i) =>
+        i === index ? { ...ing, [campoIngrediente]: valor, unidade: unidade ?? ing.unidade } : ing
+      )
+    );
+  }
+
   function adicionarIngrediente() {
     setIngredientes((prev) => [...prev, novoIngrediente()]);
+    setTextosQtd((prev) => [...prev, { usada: "", pacote: "" }]);
   }
 
   function removerIngrediente(index: number) {
     setIngredientes((prev) => prev.filter((_, i) => i !== index));
+    setTextosQtd((prev) => prev.filter((_, i) => i !== index));
   }
 
     function usarInsumo(insumo: Insumo) {
-          setIngredientes((prev) => [
-                  ...prev,
-            {
+          const novo: Ingrediente = {
                       nome: insumo.nome,
                       quantidadeUsada: 0,
                       unidade: insumo.unidade,
                       quantidadePacote: 1,
                       precoPacote: insumo.custoUnitario,
-            },
-                ]);
+          };
+          setIngredientes((prev) => [...prev, novo]);
+          setTextosQtd((prev) => [...prev, textoDeIngrediente(novo)]);
     }
 
     async function salvarNovoInsumo() {
@@ -249,6 +281,11 @@ export default function CalculadoraPage() {
                                             <Button type="button" variant="secondary" onClick={salvarNovoInsumo}>Salvar insumo</Button>
                             </div>
 
+              <p className="mb-2 text-xs text-cacau/50 dark:text-cream/50">
+                Dica: nos campos de quantidade você pode digitar só o número (ex: 200) ou o número junto com a
+                unidade (ex: 200gr, 1kg) — as duas formas funcionam.
+              </p>
+
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] border-collapse text-sm">
                   <thead>
@@ -275,10 +312,12 @@ export default function CalculadoraPage() {
                         </td>
                         <td className="py-1.5 pr-2">
                           <Input
-                            type="number"
-                            value={ing.quantidadeUsada || ""}
-                            onChange={(e) => atualizarIngrediente(index, "quantidadeUsada", e.target.value)}
-                            className="w-20"
+                            type="text"
+                            inputMode="decimal"
+                            value={textosQtd[index]?.usada ?? ""}
+                            onChange={(e) => atualizarQuantidadeTexto(index, "usada", e.target.value)}
+                            placeholder="Ex: 200 ou 200gr"
+                            className="w-24"
                           />
                         </td>
                         <td className="py-1.5 pr-2">
@@ -296,10 +335,12 @@ export default function CalculadoraPage() {
                         </td>
                         <td className="py-1.5 pr-2">
                           <Input
-                            type="number"
-                            value={ing.quantidadePacote || ""}
-                            onChange={(e) => atualizarIngrediente(index, "quantidadePacote", e.target.value)}
-                            className="w-20"
+                            type="text"
+                            inputMode="decimal"
+                            value={textosQtd[index]?.pacote ?? ""}
+                            onChange={(e) => atualizarQuantidadeTexto(index, "pacote", e.target.value)}
+                            placeholder="Ex: 1000 ou 1kg"
+                            className="w-24"
                           />
                         </td>
                         <td className="py-1.5 pr-2">
