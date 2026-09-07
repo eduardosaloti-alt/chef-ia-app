@@ -230,13 +230,53 @@ export function QuizFunil() {
         { className: "text-center" },
         h(Badge, { tone: "dourado", className: "mb-4" }, "Seu resultado"),
         h("h2", { className: "mb-3 font-display text-2xl" }, resultadoTitulo),
-        h("p", { className: "mb-4 text-sm text-cacau/70 dark:text-cream/70" }, resultadoTexto),
+        h("p", { className: "mb-6 text-sm text-cacau/70 dark:text-cream/70" }, resultadoTexto),
         h(
-          "p",
-          { className: "mb-6 rounded-xl bg-dourado/10 px-4 py-3 text-xs text-cacau/70 dark:text-cream/70" },
-          "Restam vagas de fundadora: R$ 29,90 por mes para sempre. Teste gratis por 15 dias, sem cartao de credito."
-        ),
-          h(Link, { href: "https://cheffia.site/" }, h(Button, { className: "w-full" }, "Quero garantir minha vaga de fundadora"))  
-              )
+          "div",
+          { className: "grid grid-cols-1 gap-4 text-left sm:grid-cols-2" },
+          h(
+            Card,
+            { className: "!p-4" },
+            h(Badge, { tone: "dourado", className: "mb-3" }, "Oferta de fundadora"),
+            h(
+              "p",
+              { className: "font-display text-3xl" },
+              "R$ 29,90",
+              h("span", { className: "text-sm text-cacau/50 dark:text-cream/50" }, "/mes")
+            ),
+            h(
+              "p",
+              { className: "mt-2 mb-4 text-xs text-cacau/60 dark:text-cream/60" },
+              "Travado para sempre. Teste gratis por 15 dias, sem cartao de credito."
+            ),
+            h(
+              Link,
+              { href: "https://pay.kiwify.com.br/20qPSqL" },
+              h(Button, { className: "w-full" }, "Quero o plano mensal")
+            )
+          ),
+          h(
+            Card,
+            { className: "!p-4" },
+            h(Badge, { tone: "pistache", className: "mb-3" }, "Plano anual · economize 45%"),
+            h(
+              "p",
+              { className: "font-display text-3xl" },
+              "R$ 197",
+              h("span", { className: "text-sm text-cacau/50 dark:text-cream/50" }, "/ano")
+            ),
+            h(
+              "p",
+              { className: "mt-2 mb-4 text-xs text-cacau/60 dark:text-cream/60" },
+              "Pague uma vez e use o Chef IA o ano inteiro, sai bem mais barato que o mensal."
+            ),
+            h(
+              Link,
+              { href: "https://pay.kiwify.com.br/Y1CJ5Dx" },
+              h(Button, { className: "w-full" }, "Quero o plano anual")
+            )
+          )
+        )
+      )
   );
 }
