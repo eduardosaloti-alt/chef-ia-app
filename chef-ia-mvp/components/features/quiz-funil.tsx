@@ -7,6 +7,15 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input, Label } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import { trackMetaPixel } from "@/lib/meta-pixel";
+
+const ICONS = {
+  sparkles: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Sparkles/3D/sparkles_3d.png",
+  robot: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Robot/3D/robot_3d.png",
+  cupcake: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cupcake/3D/cupcake_3d.png",
+  partyPopper: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Party%20popper/3D/party_popper_3d.png",
+  chartUp: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Chart%20increasing/3D/chart_increasing_3d.png",
+};
 
 interface Pergunta {
   pergunta: string;
@@ -79,6 +88,7 @@ export function QuizFunil() {
         respostas: respostasObj,
         segmento: respostas[0] || null,
       });
+      trackMetaPixel("Lead", { content_name: "Quiz Chef IA" });
     } catch (err) {
       console.error("Nao foi possivel salvar o lead do quiz", err);
     } finally {
@@ -117,8 +127,16 @@ export function QuizFunil() {
 
   return h(
     "div",
-    { className: "mx-auto max-w-xl px-6 py-12" },
-    fase !== "intro" &&
+    { className: "relative overflow-hidden" },
+    h("div", {
+      "aria-hidden": true,
+      className:
+        "pointer-events-none absolute -top-16 left-1/2 h-96 w-[36rem] -translate-x-1/2 rounded-full bg-framboesa/20 blur-[100px] dark:bg-framboesa/15",
+    }),
+    h(
+      "div",
+      { className: "relative mx-auto max-w-xl px-6 py-12" },
+      fase !== "intro" &&
       h(
         "div",
         { className: "mb-8" },
@@ -134,8 +152,32 @@ export function QuizFunil() {
       h(
         Card,
         { className: "text-center" },
+        h(
+          "div",
+          { className: "mb-5 flex justify-center -space-x-3" },
+          h(
+            "img",
+            {
+              src: ICONS.robot,
+              alt: "",
+              width: 56,
+              height: 56,
+              className: "-rotate-6 rounded-2xl bg-white/70 p-1.5 shadow-lg ring-1 ring-framboesa/10 dark:bg-cacau-soft/60",
+            }
+          ),
+          h(
+            "img",
+            {
+              src: ICONS.cupcake,
+              alt: "",
+              width: 56,
+              height: 56,
+              className: "translate-y-2 rotate-6 rounded-2xl bg-white/70 p-1.5 shadow-lg ring-1 ring-framboesa/10 dark:bg-cacau-soft/60",
+            }
+          )
+        ),
         h(Badge, { tone: "dourado", className: "mb-4" }, "Teste rapido, leva 1 minuto"),
-        h("h1", { className: "mb-3 font-display text-2xl" }, "Descubra se voce esta precificando certo (e por que seu caixa nunca fecha)"),
+        h("h1", { className: "mb-3 font-display text-2xl font-semibold tracking-tight" }, "Descubra se voce esta precificando certo (e por que seu caixa nunca fecha)"),
         h(
           "p",
           { className: "mb-6 text-sm text-cacau/70 dark:text-cream/70" },
@@ -150,7 +192,7 @@ export function QuizFunil() {
           h("div", null, "E como esta a organizacao dos seus pedidos e da sua agenda"),
           h("div", null, "Pra te mostrar exatamente onde o Chef IA pode ajudar")
         ),
-        h(Button, { className: "w-full", onClick: () => setFase("perguntas") }, "Comecar teste gratis")
+        h(Button, { className: "w-full shadow-lg shadow-framboesa/30", onClick: () => setFase("perguntas") }, "Comecar teste gratis")
       ),
     fase === "perguntas" &&
       h(
@@ -228,8 +270,12 @@ export function QuizFunil() {
       h(
         Card,
         { className: "text-center" },
+        h(
+          "img",
+          { src: ICONS.sparkles, alt: "", width: 48, height: 48, className: "mx-auto mb-3" }
+        ),
         h(Badge, { tone: "dourado", className: "mb-4" }, "Seu resultado"),
-        h("h2", { className: "mb-3 font-display text-2xl" }, resultadoTitulo),
+        h("h2", { className: "mb-3 font-display text-2xl font-semibold tracking-tight" }, resultadoTitulo),
         h("p", { className: "mb-6 text-sm text-cacau/70 dark:text-cream/70" }, resultadoTexto),
         h(
           "div",
@@ -237,12 +283,17 @@ export function QuizFunil() {
           h(
             Card,
             { className: "!p-4" },
-            h(Badge, { tone: "dourado", className: "mb-3" }, "Oferta de fundadora"),
+            h(
+              "div",
+              { className: "mb-3 flex items-center justify-between" },
+              h(Badge, { tone: "dourado" }, "Oferta de fundadora"),
+              h("img", { src: ICONS.partyPopper, alt: "", width: 28, height: 28 })
+            ),
             h(
               "p",
-              { className: "font-display text-3xl" },
+              { className: "font-display text-3xl font-semibold" },
               "R$ 29,90",
-              h("span", { className: "text-sm text-cacau/50 dark:text-cream/50" }, "/mes")
+              h("span", { className: "text-sm font-normal text-cacau/50 dark:text-cream/50" }, "/mes")
             ),
             h(
               "p",
@@ -251,19 +302,27 @@ export function QuizFunil() {
             ),
             h(
               Link,
-              { href: "https://pay.kiwify.com.br/20qPSqL" },
+              {
+                href: "https://pay.kiwify.com.br/20qPSqL",
+                onClick: () => trackMetaPixel("InitiateCheckout", { content_name: "Plano mensal", value: 29.9, currency: "BRL" }),
+              },
               h(Button, { className: "w-full" }, "Quero o plano mensal")
             )
           ),
           h(
             Card,
-            { className: "!p-4" },
-            h(Badge, { tone: "pistache", className: "mb-3" }, "Plano anual · economize 45%"),
+            { className: "!p-4 ring-2 ring-framboesa/40" },
+            h(
+              "div",
+              { className: "mb-3 flex items-center justify-between" },
+              h(Badge, { tone: "pistache" }, "Plano anual · economize 45%"),
+              h("img", { src: ICONS.chartUp, alt: "", width: 28, height: 28 })
+            ),
             h(
               "p",
-              { className: "font-display text-3xl" },
+              { className: "font-display text-3xl font-semibold" },
               "R$ 197",
-              h("span", { className: "text-sm text-cacau/50 dark:text-cream/50" }, "/ano")
+              h("span", { className: "text-sm font-normal text-cacau/50 dark:text-cream/50" }, "/ano")
             ),
             h(
               "p",
@@ -272,11 +331,15 @@ export function QuizFunil() {
             ),
             h(
               Link,
-              { href: "https://pay.kiwify.com.br/Y1CJ5Dx" },
-              h(Button, { className: "w-full" }, "Quero o plano anual")
+              {
+                href: "https://pay.kiwify.com.br/Y1CJ5Dx",
+                onClick: () => trackMetaPixel("InitiateCheckout", { content_name: "Plano anual", value: 197, currency: "BRL" }),
+              },
+              h(Button, { className: "w-full shadow-lg shadow-framboesa/30" }, "Quero o plano anual")
             )
           )
         )
       )
+    )
   );
 }
